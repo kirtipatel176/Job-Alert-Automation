@@ -1,0 +1,414 @@
+{
+  "name": "Job Alert Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "cfa83ef6-371b-4cfe-8672-c5eebf13c380",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://www.linkedin.com/jobs/search/?keywords=fullstackdeveloper%20developer",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "Mozilla/5.0"
+            },
+            {
+              "name": "Accept",
+              "value": "text/html"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "685e0c37-f1f9-45ca-8cc9-855ca03b04c6",
+      "name": "HTTP Request",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ed258d35-f6fc-4ac6-805c-611b4e6ce2e6",
+              "leftValue": "={{ $json.job_title }}",
+              "rightValue": "=Developer",
+              "operator": {
+                "type": "array",
+                "operation": "contains",
+                "rightType": "any"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        784,
+        0
+      ],
+      "id": "9ae607f4-e2ef-4ac3-aa5b-c1b3317090ee",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "163419eb-f6d5-4025-8611-f4a6f7e62819",
+              "name": "job_title",
+              "value": "={{ $json.job_title }}",
+              "type": "array"
+            },
+            {
+              "id": "5532e763-423c-4c5b-866f-2b51824cd6f2",
+              "name": "company",
+              "value": "={{ $json.company }}",
+              "type": "array"
+            },
+            {
+              "id": "1390b3ec-1682-44dd-b9fe-79d77b1a21d6",
+              "name": "job_link",
+              "value": "={{ $json.job_link }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        896,
+        -160
+      ],
+      "id": "6cc29dce-f28c-4db5-9d1d-5e857fddb950",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "6eb1dda4-369b-4e38-9369-94b3912008c7",
+              "leftValue": "={{ $json.job_title }}",
+              "rightValue": "=Developer",
+              "operator": {
+                "type": "array",
+                "operation": "contains",
+                "rightType": "any"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1248,
+        -32
+      ],
+      "id": "a42c2647-ea99-496e-882c-65f55e0a517e",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "job_title",
+              "cssSelector": ".base-search-card__title",
+              "returnArray": true
+            },
+            {
+              "key": "company",
+              "cssSelector": ".base-search-card__subtitle",
+              "returnArray": true
+            },
+            {
+              "key": "job_link",
+              "cssSelector": ".base-card__full-link",
+              "returnValue": "attribute",
+              "attribute": "href",
+              "returnArray": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        368,
+        0
+      ],
+      "id": "279e5052-332e-44d1-9a85-ebedcfd88aef",
+      "name": "HTML"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "job_title company job_link",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        576,
+        0
+      ],
+      "id": "ef514d23-9216-495e-a457-0d44b078f1e8",
+      "name": "Split Out",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1RMCVmhTvueiC_YxMS8vIit-Tp91ZYULtai88ZPqgmtc",
+          "mode": "list",
+          "cachedResultName": "inquiries",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1RMCVmhTvueiC_YxMS8vIit-Tp91ZYULtai88ZPqgmtc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1RMCVmhTvueiC_YxMS8vIit-Tp91ZYULtai88ZPqgmtc/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "job_title": "={{ $json.job_title }}",
+            "company": "={{ $json.company }}",
+            "job_link": "={{ $json.job_link }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "job_title",
+              "displayName": "job_title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "company",
+              "displayName": "company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "job_link",
+              "displayName": "job_link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1040,
+        -48
+      ],
+      "id": "86681ae7-06c1-41b9-a5ea-9fdce877ae13",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8Wm6YUfAzFvXwK6L",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "kirti.vedanco@gmail.com",
+        "subject": "={{ $json.job_title }}",
+        "message": "={{ $json.company }} and {{ $json.job_link }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1456,
+        -128
+      ],
+      "id": "3643053e-0146-425e-88cd-20fdbeeb8dc7",
+      "name": "Send a message",
+      "webhookId": "3f175b6b-ccda-4c5d-86cc-e673a6327dae",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "alj4ZWgL2WUY3t2g",
+          "name": "Gmail account 4"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        []
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "673a365d-e5f5-4c11-8a6c-83f8c418730c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0f6d2f3898bb3081f42ff540d426bd55bff7b8691bc48bd4fbe21a3867635201"
+  },
+  "id": "bgRaeDYh03Srg9ji",
+  "tags": []
+}
